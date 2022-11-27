@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:my_notes_app/views/NotesView.dart';
@@ -21,6 +22,7 @@ void main() {
       routes: {
         RegisterView.routeName: (context) => const RegisterView(),
         LoginView.routeName: (context) => LoginView(),
+        NotesView.routeName: (context) => NotesView(),
         // '/login/': ((context) => LoginView()),
         // '/register/': ((context) => RegisterView()),
       },
@@ -58,5 +60,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
-enum MenuAction { logout }

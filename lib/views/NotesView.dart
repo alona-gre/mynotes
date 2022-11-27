@@ -8,6 +8,8 @@ import 'dart:developer' as devtools show log;
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
 
+  static const routeName = '/notes/';
+
   @override
   State<NotesView> createState() => _NotesViewState();
 }
