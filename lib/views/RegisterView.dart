@@ -7,6 +7,8 @@ import '../firebase_options.dart';
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
+  static const routeName = '/register/';
+
   @override
   State<RegisterView> createState() => RegisterViewState();
 }
@@ -33,64 +35,57 @@ class RegisterViewState extends State<RegisterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Register"),
+        title: Text("Register"),
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return Column(
-                children: [
-                  TextField(
-                    controller: _email,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                        hintText: "Enter your email address"),
-                  ),
-                  TextField(
-                    controller: _password,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    obscureText: true,
-                    decoration:
-                        const InputDecoration(hintText: "Enter your password"),
-                  ),
-                  TextButton(
-                    child: const Text("Register"),
-                    onPressed: () async {
-                      final email = _email.text;
-                      final password = _password.text;
-                      try {
-                        final userCredential = await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                          email: email,
-                          password: password,
-                        );
-                        print(userCredential);
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == "weak-password") {
-                          print("too weak password");
-                        } else if (e.code == "email-already-in-use") {
-                          print("email address is in use already");
-                        } else if (e.code == "invalid-email") {
-                          print("email invalid");
-                        } else {
-                          print(e.code);
-                        }
-                      }
-                    },
-                  ),
-                ],
-              );
-            default:
-              return const Text("Loading");
-          }
-        },
+      body: Column(
+        children: [
+          TextField(
+            controller: _email,
+            enableSuggestions: false,
+            autocorrect: false,
+            keyboardType: TextInputType.emailAddress,
+            decoration:
+                const InputDecoration(hintText: "Enter your email address"),
+          ),
+          TextField(
+            controller: _password,
+            enableSuggestions: false,
+            autocorrect: false,
+            obscureText: true,
+            decoration: const InputDecoration(hintText: "Enter your password"),
+          ),
+          TextButton(
+            child: const Text("Register"),
+            onPressed: () async {
+              final email = _email.text;
+              final password = _password.text;
+              try {
+                final userCredential =
+                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+                print(userCredential);
+              } on FirebaseAuthException catch (e) {
+                if (e.code == "weak-password") {
+                  print("too weak password");
+                } else if (e.code == "email-already-in-use") {
+                  print("email address is in use already");
+                } else if (e.code == "invalid-email") {
+                  print("email invalid");
+                } else {
+                  print(e.code);
+                }
+              }
+            },
+          ),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/login/', (route) => false);
+              },
+              child: Text('Already registered? Log in here!')),
+        ],
       ),
     );
   }

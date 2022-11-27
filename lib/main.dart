@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'views/RegisterView.dart';
 import 'views/LoginView.dart';
+import 'views/VerifyEmailView.dart';
 
 import '../firebase_options.dart';
 
@@ -16,6 +17,12 @@ void main() {
         primarySwatch: Colors.blue,
       ),
       home: HomePage(),
+      routes: {
+        RegisterView.routeName: (context) => const RegisterView(),
+        LoginView.routeName: (context) => LoginView(),
+        // '/login/': ((context) => LoginView()),
+        // '/register/': ((context) => RegisterView()),
+      },
     ),
   );
 }
@@ -25,30 +32,28 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("HomePage"),
+    return FutureBuilder(
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              final user = FirebaseAuth.instance.currentUser;
-              if (user?.emailVerified ?? false) {
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              if (user.emailVerified) {
                 print("Email is verified");
               } else {
-                print("you need to verify your email address");
+                return const VerifyEmailView();
               }
-              return const Text("Done");
-
-            default:
-              return const Text("Loading");
-          }
-        },
-      ),
+            } else {
+              return const LoginView();
+            }
+            return const Text("Done");
+          default:
+            return CircularProgressIndicator();
+        }
+      },
     );
   }
 }
