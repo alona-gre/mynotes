@@ -5,6 +5,8 @@ import 'package:my_notes_app/views/NotesView.dart';
 
 import 'dart:developer' as devtools show log;
 
+import '../utilities/show-error-dialog.dart';
+
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -71,12 +73,26 @@ class _LoginViewState extends State<LoginView> {
                 devtools.log(userCredential.toString());
               } on FirebaseAuthException catch (e) {
                 if (e.code == "user-not-found") {
-                  devtools.log("the user with such credentials is not found");
+                  await showErrorDialog(
+                    context,
+                    "User not found",
+                  );
                 } else if (e.code == "wrong-password") {
-                  devtools.log("the password is incorrect");
+                  await showErrorDialog(
+                    context,
+                    "Wrong password",
+                  );
                 } else {
-                  devtools.log("something went wrong");
+                  await showErrorDialog(
+                    context,
+                    'Error: ${e.code}',
+                  );
                 }
+              } catch (e) {
+                await showErrorDialog(
+                  context,
+                  'Error: ${e.toString()}',
+                );
               }
             },
           ),
@@ -85,7 +101,7 @@ class _LoginViewState extends State<LoginView> {
               Navigator.of(context)
                   .pushNamedAndRemoveUntil(registerRoute, (route) => false);
             },
-            child: Text('Haven\'t registered yet? Register here!'),
+            child: const Text('Haven\'t registered yet? Register here!'),
           ),
         ],
       ),
