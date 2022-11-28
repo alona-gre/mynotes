@@ -5,10 +5,12 @@ import 'package:flutter/src/widgets/framework.dart';
 
 import 'dart:developer' as devtools show log;
 
+import 'package:my_notes_app/constants/routes.dart';
+
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
 
-  static const routeName = '/notes/';
+  //static const routeName = '/notes/';
 
   @override
   State<NotesView> createState() => _NotesViewState();
@@ -34,7 +36,7 @@ class _NotesViewState extends State<NotesView> {
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/login/', (_) => false);
+                        .pushNamedAndRemoveUntil(loginRoute, (_) => false);
                   }
                   break;
               }
