@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'dart:developer' as devtools show log;
-
 import 'package:my_notes_app/constants/routes.dart';
+
+import '../utilities/show-error-dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -61,22 +61,37 @@ class RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential =
-                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
                   email: email,
                   password: password,
                 );
-                devtools.log(userCredential.toString());
+                final user = FirebaseAuth.instance.currentUser;
+                await user?.sendEmailVerification();
+                Navigator.of(context).pushNamed(verifyEmailRoute);
               } on FirebaseAuthException catch (e) {
                 if (e.code == "weak-password") {
-                  devtools.log("too weak password");
+                  await showErrorDialog(
+                    context,
+                    "Password is too weak",
+                  );
                 } else if (e.code == "email-already-in-use") {
-                  devtools.log("email address is in use already");
+                  await showErrorDialog(
+                    context,
+                    "This email address is already in use",
+                  );
                 } else if (e.code == "invalid-email") {
-                  devtools.log("email invalid");
+                  await showErrorDialog(
+                    context,
+                    "Invalid email address",
+                  );
                 } else {
-                  devtools.log(e.code);
+                  await showErrorDialog(context, "Error: ${e.code}");
                 }
+              } catch (e) {
+                await showErrorDialog(
+                  context,
+                  'Error: ${e.toString()}',
+                );
               }
             },
           ),
