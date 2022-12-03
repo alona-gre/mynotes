@@ -1,0 +1,17 @@
+import 'package:flutter/material.dart';
+import 'package:my_notes_app/services/auth/auth_user.dart';
+
+abstract class AuthProvider {
+  AuthUser? get currentUser;
+
+  Future<AuthUser> logIn({
+    required String email,
+    required String password,
+  });
+  Future<AuthUser> createUser({
+    required String email,
+    required String password,
+  });
+  Future<void> logOut();
+  Future<void> sendEmailVerification();
+}
