@@ -4,7 +4,9 @@ import 'dart:developer' as devtools show log;
 
 import 'package:my_notes_app/constants/routes.dart';
 import 'package:my_notes_app/services/auth/auth_service.dart';
+import 'package:my_notes_app/services/auth/auth_user.dart';
 import 'package:my_notes_app/services/crud/notes_service.dart';
+import 'package:path/path.dart';
 
 import '../../enums/menu_actions.dart';
 
@@ -19,6 +21,7 @@ class NotesView extends StatefulWidget {
 
 class _NotesViewState extends State<NotesView> {
   late final NotesService _notesService;
+
   String get userEmail => AuthService.firebase().currentUser!.email!;
 
   @override
@@ -83,6 +86,7 @@ class _NotesViewState extends State<NotesView> {
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
+                      case ConnectionState.active:
                         return const Text("Waiting for all notes");
                       default:
                         return const CircularProgressIndicator();
