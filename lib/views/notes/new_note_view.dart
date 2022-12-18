@@ -1,56 +1,18 @@
 import 'package:flutter/material.dart';
-
-import '../../services/auth/auth_service.dart';
-import '../../services/crud/notes_service.dart';
+import 'package:my_notes_app/services/auth/auth_service.dart';
+import 'package:my_notes_app/services/crud/notes_service.dart';
 
 class NewNoteView extends StatefulWidget {
-  const NewNoteView({super.key});
+  const NewNoteView({Key? key}) : super(key: key);
 
   @override
-  State<NewNoteView> createState() => _NewNoteViewState();
+  _NewNoteViewState createState() => _NewNoteViewState();
 }
 
 class _NewNoteViewState extends State<NewNoteView> {
   DatabaseNote? _note;
   late final NotesService _notesService;
   late final TextEditingController _textController;
-
-  Future<DatabaseNote> createNewNote() async {
-    final existingNote = _note;
-    if (existingNote != null) {
-      return existingNote;
-    }
-    final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email!;
-    final owner = await _notesService.getUser(email: email);
-    return await _notesService.createNote(owner: owner);
-  }
-
-  void _deleteNoteIfEmpty() {
-    final note = _note;
-    if (_textController.text.isEmpty && note != null) {
-      _notesService.deleteNote(id: note.id);
-    }
-  }
-
-  void _saveNoteIfTextIsNotEmpty() async {
-    final note = _note;
-    final text = _textController.text;
-    if (_textController.text.isNotEmpty && note != null) {
-      await _notesService.updateNote(
-        note: note,
-        text: text,
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _deleteNoteIfEmpty();
-    _saveNoteIfTextIsNotEmpty();
-    _textController.dispose();
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -76,6 +38,43 @@ class _NewNoteViewState extends State<NewNoteView> {
     _textController.addListener(_textControllerListener);
   }
 
+  Future<DatabaseNote> createNewNote() async {
+    final existingNote = _note;
+    if (existingNote != null) {
+      return existingNote;
+    }
+    final currentUser = AuthService.firebase().currentUser!;
+    final email = currentUser.email!;
+    final owner = await _notesService.getUser(email: email);
+    return await _notesService.createNote(owner: owner);
+  }
+
+  void _deleteNoteIfTextIsEmpty() {
+    final note = _note;
+    if (_textController.text.isEmpty && note != null) {
+      _notesService.deleteNote(id: note.id);
+    }
+  }
+
+  void _saveNoteIfTextNotEmpty() async {
+    final note = _note;
+    final text = _textController.text;
+    if (note != null && text.isNotEmpty) {
+      await _notesService.updateNote(
+        note: note,
+        text: text,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _deleteNoteIfTextIsEmpty();
+    _saveNoteIfTextNotEmpty();
+    _textController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +93,7 @@ class _NewNoteViewState extends State<NewNoteView> {
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: const InputDecoration(
-                  hintText: 'Start typing your note here',
+                  hintText: 'Start typing your note...',
                 ),
               );
             default:

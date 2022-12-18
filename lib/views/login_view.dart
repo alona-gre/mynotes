@@ -2,23 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:my_notes_app/constants/routes.dart';
 import 'package:my_notes_app/services/auth/auth_exceptions.dart';
 import 'package:my_notes_app/services/auth/auth_service.dart';
-
-import 'dart:developer' as devtools show log;
-
-import '../utilities/show-error-dialog.dart';
+import 'package:my_notes_app/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({super.key});
-
-  static const routeName = '/login/';
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
 }
 
 class _LoginViewState extends State<LoginView> {
-  late TextEditingController _email;
-  late TextEditingController _password;
+  late final TextEditingController _email;
+  late final TextEditingController _password;
 
   @override
   void initState() {
@@ -38,7 +33,7 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"),
+        title: const Text('Login'),
       ),
       body: Column(
         children: [
@@ -47,45 +42,51 @@ class _LoginViewState extends State<LoginView> {
             enableSuggestions: false,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
-            decoration:
-                const InputDecoration(hintText: "Enter your email address"),
+            decoration: const InputDecoration(
+              hintText: 'Enter your email here',
+            ),
           ),
           TextField(
             controller: _password,
+            obscureText: true,
             enableSuggestions: false,
             autocorrect: false,
-            obscureText: true,
-            decoration: const InputDecoration(hintText: "Enter your password"),
+            decoration: const InputDecoration(
+              hintText: 'Enter your password here',
+            ),
           ),
           TextButton(
-            child: const Text("Log in"),
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential = await AuthService.firebase().logIn(
+                await AuthService.firebase().logIn(
                   email: email,
                   password: password,
                 );
                 final user = AuthService.firebase().currentUser;
                 if (user?.isEmailVerified ?? false) {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(notesRoute, (route) => false);
-                  devtools.log(userCredential.toString());
-                } else {
+                  // user's email is verified
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                      verifyEmailRoute, (route) => false);
-                  devtools.log(userCredential.toString());
+                    notesRoute,
+                    (route) => false,
+                  );
+                } else {
+                  // user's email is NOT verified
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyEmailRoute,
+                    (route) => false,
+                  );
                 }
               } on UserNotFoundAuthException {
                 await showErrorDialog(
                   context,
-                  "User not found",
+                  'User not found',
                 );
               } on WrongPasswordAuthException {
                 await showErrorDialog(
                   context,
-                  "Wrong password",
+                  'Wrong credentials',
                 );
               } on GenericAuthException {
                 await showErrorDialog(
@@ -94,14 +95,17 @@ class _LoginViewState extends State<LoginView> {
                 );
               }
             },
+            child: const Text('Login'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(registerRoute, (route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                registerRoute,
+                (route) => false,
+              );
             },
-            child: const Text('Haven\'t registered yet? Register here!'),
-          ),
+            child: const Text('Not registered yet? Register here!'),
+          )
         ],
       ),
     );
