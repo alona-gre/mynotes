@@ -6,10 +6,15 @@ import 'package:my_notes_app/services/auth/auth_service.dart';
 import 'package:my_notes_app/services/auth/bloc/auth_event.dart';
 import 'package:my_notes_app/services/cloud/firebase_cloud_storage.dart';
 import 'package:my_notes_app/views/notes/notes_list_view.dart';
+import 'package:my_notes_app/extensions/buildcontext/loc.dart';
 
 import '../../services/auth/bloc/auth_bloc.dart';
 import '../../services/cloud/cloud_note.dart';
 import '../../utilities/dialogs/logout_dialog.dart';
+
+extension Count<T extends Iterable> on Stream<T> {
+  Stream<int> get getLength => map((event) => event.length);
+}
 
 class NotesView extends StatefulWidget {
   const NotesView({Key? key}) : super(key: key);
@@ -32,7 +37,17 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Notes'),
+        title: StreamBuilder(
+            stream: _notesService.allNotes(ownerUserId: userId).getLength,
+            builder: (context, AsyncSnapshot<int> snapshot) {
+              if (snapshot.hasData) {
+                final noteCount = snapshot.data ?? 0;
+                final text = context.loc.notes_title(noteCount);
+                return Text(text);
+              } else {
+                return const Text('');
+              }
+            }),
         actions: [
           IconButton(
             onPressed: () {
@@ -53,10 +68,10 @@ class _NotesViewState extends State<NotesView> {
               }
             },
             itemBuilder: (context) {
-              return const [
+              return [
                 PopupMenuItem<MenuAction>(
                   value: MenuAction.logout,
-                  child: Text('Log out'),
+                  child: Text(context.loc.logout_button),
                 ),
               ];
             },

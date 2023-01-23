@@ -9,6 +9,7 @@ import 'package:my_notes_app/services/auth/bloc/auth_state.dart';
 import 'package:my_notes_app/services/auth/firebase_auth_provider.dart';
 import 'package:my_notes_app/views/forgot_password_view.dart';
 import 'package:my_notes_app/views/notes/notes_view.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'views/register_view.dart';
 import 'views/login_view.dart';
@@ -19,6 +20,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
